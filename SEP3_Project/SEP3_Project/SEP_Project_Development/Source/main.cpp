@@ -3,15 +3,17 @@
 @author  pghali@digipen.edu
 @date    10/11/2016
 
-This file uses functionality defined in type GLApp to initialize an OpenGL
-context and implement a game loop.
+This file uses functionality defined in types GLHelper and GLApp to initialize
+an OpenGL context and implement a game loop.
 
 *//*__________________________________________________________________________*/
+
 
 /*                                                                   includes
 ----------------------------------------------------------------------------- */
 // Extension loader library's header must be included before GLFW's header!!!
-#include "../include/glapp.h"
+#include <glhelper.h>
+#include <glapp.h>
 #include <iostream>
 
 /*                                                   type declarations
@@ -22,9 +24,7 @@ context and implement a game loop.
 static void draw();
 static void update();
 static void init();
-
-/*                                                   objects with file scope
------------------------------------------------------------------------------ */
+static void cleanup();
 
 /*                                                      function definitions
 ----------------------------------------------------------------------------- */
@@ -40,58 +40,94 @@ Indicates how the program existed. Normal exit is signaled by a return value of
 Note that the C++ compiler will insert a return 0 statement if one is missing.
 */
 int main() {
-  // start with a 16:9 aspect ratio
-  if (!GLApp::init(1366, 768, "Tutorial 0 | Setting up OpenGL 4.5")) {
-      std::cout << "Unable to create OpenGL context" << std::endl;
-    std::exit(EXIT_FAILURE);
-  }
+    // Part 1
+    init();
 
-  // window's close flag is set by clicking close widget or Alt+F4
-  while (!glfwWindowShouldClose(GLApp::ptr_window)) {
-    draw();
-    update();
-  }
-  
-  GLApp::cleanup();
+    // Part 2
+    while (!glfwWindowShouldClose(GLHelper::ptr_window)) {
+        // Part 2a
+        update();
+        // Part 2b
+        draw();
+    }
+
+    // Part 3
+    cleanup();
+}
+
+/*  _________________________________________________________________________ */
+/*! update
+@param none
+@return none
+
+Uses GLHelper::GLFWWindow* to get handle to OpenGL context.
+For now, there are no objects to animate nor keyboard, mouse button click,
+mouse movement, and mouse scroller events to be processed.
+*/
+static void update() {
+    // Part 1
+    glfwPollEvents();
+
+    // Part 2
+    GLHelper::update_time(1.0);
+
+    // Part 3
+    GLApp::update();
 }
 
 /*  _________________________________________________________________________ */
 /*! draw
-
 @param none
-
 @return none
 
 Call application to draw and then swap front and back frame buffers ...
 Uses GLHelper::GLFWWindow* to get handle to OpenGL context.
 */
 static void draw() {
-  // render scene
-  GLApp::draw();
+    // Part 1
+    GLApp::draw();
 
-  // swap buffers: front <-> back
-  // GLApp::ptr_window is handle to window that defines the OpenGL context
-  glfwSwapBuffers(GLApp::ptr_window); 
+    // Part 2: swap buffers: front <-> back
+    glfwSwapBuffers(GLHelper::ptr_window);
 }
 
 /*  _________________________________________________________________________ */
-/*! update
-
+/*! init
 @param none
-
 @return none
 
-Make sure callbacks are invoked when state changes in input devices occur.
-Ensure time per frame and FPS are recorded.
-Let application update state changes (such as animation).
+The OpenGL context initialization stuff is abstracted away in GLHelper::init.
+The specific initialization of OpenGL state and geometry data is
+abstracted away in GLApp::init
 */
-static void update() {
-  // process events if any associated with input devices
-  glfwPollEvents();
+static void init() {
+    // Part 1
+    //1366x768 dimension
+    if (!GLHelper::init(1366, 768, "Tutorial 1")) {
+        std::cout << "Unable to create OpenGL context" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
 
-  // main loop computes fps and other time related stuff once for all apps ...
-  GLApp::update_time(1.0);
+    // Part 2
+    GLHelper::print_specs();
 
-  // animate scene
-  GLApp::update();
+    // Part 3
+    GLApp::init();
+}
+
+/*  _________________________________________________________________________ */
+/*! cleanup
+@param none
+@return none
+
+Return allocated resources for window and OpenGL context thro GLFW back
+to system.
+Return graphics memory claimed through
+*/
+void cleanup() {
+    // Part 1
+    GLApp::cleanup();
+
+    // Part 2
+    GLHelper::cleanup();
 }

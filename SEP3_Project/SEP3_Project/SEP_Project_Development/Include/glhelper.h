@@ -58,6 +58,7 @@ struct GLHelper
   static std::vector<bool> keyStatesAlphabet;
   static std::vector<bool> mouseStates;
 
+  static GLboolean keystateP;			// keystate boolean for 'P' Key
   static GLboolean LMouseState;			// Mouse state boolean for 'L Mouse Button/Mouse Button 1' 
   static void print_specs();
 };
